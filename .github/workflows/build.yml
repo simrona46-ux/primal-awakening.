@@ -1,0 +1,41 @@
+
+name: Build Primal Awakening
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '7.5.1'
+
+      - name: Unpack source archive
+        run: unzip -q primal-awakening-alpha-source-v54-egg-collision.zip
+
+      - name: Build mod
+        working-directory: primal_awakening
+        run: gradle --no-daemon build
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: primal-awakening-1.14.1-alpha
+          path: primal_awakening/build/libs/*.jar
+          if-no-files-found: error
